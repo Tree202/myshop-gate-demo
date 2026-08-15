@@ -1,0 +1,19 @@
+# ---- Python 垃圾 ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 虚拟环境(几千个文件、几十 MB)----
+.venv/
+venv/
+
+# ---- 密钥,千万别提交 ----
+.env
+
+# ---- 数据库文件 ----
+*.db
+
+# ---- macOS ----
+.DS_Store

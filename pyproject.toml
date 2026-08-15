@@ -1,0 +1,40 @@
+[project]
+name = "myshop"
+version = "0.1.0"
+description = "用来演示测试金字塔四层的迷你商店"
+requires-python = ">=3.9"
+dependencies = []            # 主代码只用标准库,不装任何第三方包
+
+[project.optional-dependencies]
+# .venv/bin/python -m pip install -e ".[dev]" 一次装齐开发工具
+dev = ["pytest>=8", "mypy>=1.10", "ruff>=0.5"]
+
+# ---------------- pytest:跑测试 ----------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]        # 只去 tests/ 里找测试,别扫整个项目
+pythonpath = ["."]           # ← 救命稻草:让 `import myshop` 能找到包
+addopts = "-v --strict-markers"   # -v = 每条测试单独打一行,初学者看得更清楚
+# 只有名字符合这些规则的东西才会被当成测试
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+# ---------------- mypy:静态类型检查 ----------------
+[tool.mypy]
+python_version = "3.9"
+files = ["myshop", "tests"]
+strict = true                # 一步到位开严格模式
+check_untyped_defs = true    # 连没写类型标注的函数体也检查(防 AI 漏写 -> None)
+
+[[tool.mypy.overrides]]
+module = "playwright.*"      # playwright 没装,别因为找不到它就报错
+ignore_missing_imports = true
+
+# ---------------- ruff:格式 + 语法检查(比 flake8 快很多)----------------
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+# E=代码风格 F=真正的错误(未使用变量等) I=import 排序 B=常见 bug 陷阱
+# 注意:Python 3.9 上不要加 "UP",它会催你用 3.10+ 才有的语法
+select = ["E", "F", "I", "B"]
