@@ -15,4 +15,4 @@ def format_price(cents: int) -> str:
     # divmod(1234, 100) 一次返回 (12, 34):12 块、34 分
     yuan, fen = divmod(cents, 100)
     # :02d 表示不足两位就在前面补 0,所以 5 分会变成 "05"
-    return f"${yuan}.{fen:02d}"
+    return f"¥{yuan}.{fen:02d}"
