@@ -1,0 +1,50 @@
+# ============================================================
+# 质量门禁(Quality Gate)
+#
+# 这个文件放在 .github/workflows/ 下面,GitHub 会自动发现它。
+# 它跑在 GitHub 的服务器上,不是你的电脑上 —— 这是它绕不过去的原因。
+#
+# 触发时机:每次 push,以及每次开 Pull Request
+# 判定规则:任何一个 step 的命令返回非 0,这个 job 就算失败
+# ============================================================
+
+name: 质量门禁
+
+on:
+  push:
+    branches: [main]
+  pull_request:            # 开 PR 时也跑 —— 这是门禁真正起作用的地方
+
+jobs:
+  gate:
+    name: 三道检查
+    runs-on: ubuntu-latest       # GitHub 提供的一台干净的 Linux 机器
+
+    steps:
+      # ---- 准备:把代码拉下来 ----
+      - name: 拉取代码
+        uses: actions/checkout@v7
+
+      # ---- 准备:装 Python ----
+      - name: 装 Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # ---- 准备:装三个工具 ----
+      # 注意这里没有虚拟环境:CI 的机器本来就是一次性的,
+      # 跑完就销毁,不存在"污染系统环境"的问题,所以直接装。
+      - name: 装检查工具
+        run: pip install pytest mypy ruff
+
+      # ============ 门禁 1:代码规范(最快,先跑)============
+      - name: 门禁 1 · ruff 代码规范
+        run: ruff check .
+
+      # ============ 门禁 2:类型检查 ============
+      - name: 门禁 2 · mypy 类型检查
+        run: mypy
+
+      # ============ 门禁 3:测试(最慢,放最后)============
+      - name: 门禁 3 · pytest 全部测试
+        run: pytest -q
