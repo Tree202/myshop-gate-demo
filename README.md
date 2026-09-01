@@ -1,13 +1,18 @@
 # myshop —— 测试金字塔演示项目
 
-一个迷你网上商店,用来演示测试金字塔的四层。配套教程见上一级目录的
-`claude-code-sop.html` 等四份 HTML。
+一个迷你网上商店,用来演示测试金字塔的四层。配套教程见同级目录
+`ai-workflow/` 下的 23 页 HTML(`claude-code-sop.html` 等四份是第一版,已被其取代)。
 
 ## 快速开始
 
 ```bash
-cd ~/Desktop/claude_data/learn_claude/myshop
+# macOS / Linux(在本项目根目录执行)
 .venv/bin/python -m pytest
+```
+
+```powershell
+# Windows PowerShell(在本项目根目录执行;虚拟环境不存在时先 python -m venv .venv)
+.\.venv\Scripts\python.exe -m pytest
 ```
 
 应该看到 `17 passed, 1 skipped`(skipped 的是 E2E,需要装 playwright)。
@@ -17,11 +22,12 @@ cd ~/Desktop/claude_data/learn_claude/myshop
 ```bash
 .venv/bin/python -m ruff check .     # 规范检查   0.02 秒
 .venv/bin/python -m mypy             # 类型检查   0.27 秒
-.venv/bin/python -m pytest           # 全量测试   3.66 秒
+.venv/bin/python -m pytest           # 全量测试   3.66 秒(macOS 实测;Windows 约 4 秒)
 ```
 
-> ⚠️ 一律用 `.venv/bin/python -m xxx` 的形式。
+> ⚠️ 一律用 `.venv/bin/python -m xxx` 的形式(Windows 对应 `.venv\Scripts\python.exe -m xxx`)。
 > Claude Code 在 Bash 里跑命令不继承你终端的 `activate` 状态,写全路径才可靠。
+> Windows 终端中文乱码时先执行 `$env:PYTHONUTF8="1"`。
 
 ## 目录结构
 
