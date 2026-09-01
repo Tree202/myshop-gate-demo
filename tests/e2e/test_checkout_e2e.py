@@ -24,14 +24,18 @@ pytest.importorskip(
     "playwright.sync_api",
     reason="E2E 需要:pip install pytest-playwright && playwright install chromium",
 )
+# 写法一的 page fixture 由 pytest-playwright 提供 —— 只装 playwright 不装它,
+# 上面那条守不住:模块导入成功、测试却会报 fixture not found 而不是跳过
+pytest.importorskip(
+    "pytest_playwright",
+    reason="写法一的 page fixture 需要:pip install pytest-playwright",
+)
 
 # noqa: E402 是告诉 ruff:我知道 import 不在文件最顶上,这里是故意的
 from playwright.sync_api import Page, expect, sync_playwright  # noqa: E402
 
-首页 = "http://127.0.0.1:8000"
 
-
-def _走一遍下单流程(页面: Page) -> None:
+def _走一遍下单流程(页面: Page, 首页: str) -> None:
     """两种写法共用的主流程 —— 定位方式一样,只是谁来提供浏览器不同。
 
     按「用户看得见的东西」定位,而不是按 CSS class ——
@@ -48,12 +52,14 @@ def _走一遍下单流程(页面: Page) -> None:
     expect(页面.get_by_text("下单成功")).to_be_visible()
 
 
-def test_用户可以从首页一路下单成功(page: Page) -> None:
-    """写法一:用 pytest-playwright 提供的 page fixture(推荐,最省事)。"""
-    _走一遍下单流程(page)
+def test_用户可以从首页一路下单成功(page: Page, 商店服务器: str) -> None:
+    """写法一:用 pytest-playwright 提供的 page fixture(推荐,最省事)。
+
+    地址从 conftest 的夹具拿 —— 端口只在那一处定义,这里不再写死一份。"""
+    _走一遍下单流程(page, 商店服务器)
 
 
-def test_不装_pytest_playwright_时的原始写法() -> None:
+def test_不装_pytest_playwright_时的原始写法(商店服务器: str) -> None:
     """写法二:不用 fixture,自己开浏览器再关掉。看清楚流程用。
 
     ⚠️ 为什么要套一层线程 —— 这是真跑起来才发现的坑:
@@ -76,7 +82,7 @@ def test_不装_pytest_playwright_时的原始写法() -> None:
                 浏览器 = p.chromium.launch(headless=True)  # headless=False 可以看见窗口
                 页面 = 浏览器.new_page()
                 try:
-                    _走一遍下单流程(页面)
+                    _走一遍下单流程(页面, 商店服务器)
                 finally:
                     浏览器.close()
         except BaseException as exc:  # noqa: BLE001  子线程的异常要带回主线程

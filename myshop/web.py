@@ -14,13 +14,17 @@
     服务端一旦存了会话状态,测试之间就会互相污染,
     那正是第 10 页讲的「E2E 抖动」最常见的来源之一。
 
+命名说明:
+    本模块用中文标识符,与测试层一致而与其余源码(英文)不同 ——
+    它是专为第 4 层测试而建的配套设施,跟着测试的可读性优先原则走。
+
 它不负责算钱:
     价格还是交给 price.format_price,下单还是交给 order.create_order。
     这一层只做「把 HTTP 翻译成函数调用,再把结果翻译成 HTML」。
 """
 
 from http.server import HTTPServer
-from typing import Dict
+from typing import Dict, List
 from urllib.parse import parse_qs, unquote
 
 from myshop.api import ShopHandler
@@ -32,7 +36,11 @@ from myshop.order import create_order
 
 
 def _页面(标题: str, 正文: str) -> bytes:
-    """套一层最小的 HTML 骨架。lang="zh" 让浏览器按中文断行。"""
+    """套一层最小的 HTML 骨架。lang="zh" 让浏览器按中文断行。
+
+    注意:这里直接拼字符串、没做 HTML 转义 —— 目前插进来的只有
+    写死的常量和 int,所以安全。哪天要插用户输入的文本,
+    先过 html.escape(),否则就是 XSS。"""
     return (
         '<!doctype html><html lang="zh"><head><meta charset="utf-8">'
         f"<title>{标题}</title></head><body>{正文}</body></html>"
@@ -115,7 +123,7 @@ class WebHandler(ShopHandler):
         长度 = int(self.headers.get("Content-Length") or 0)
         if not 长度:
             return 1
-        表单: Dict[str, list[str]] = parse_qs(self.rfile.read(长度).decode("utf-8"))
+        表单: Dict[str, List[str]] = parse_qs(self.rfile.read(长度).decode("utf-8"))
         值 = 表单.get("qty", ["1"])[0]
         try:
             return int(值)
