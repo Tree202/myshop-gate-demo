@@ -145,6 +145,14 @@ def make_web_server(port: int = 8000) -> HTTPServer:
 
 
 if __name__ == "__main__":
+    # 同 api.py:输出被重定向或被工具捕获时,Windows 的 stdout 会退回系统代码页,
+    # 下面那句中文会直接 UnicodeEncodeError,服务器起不来。原因写在 api.py 里。
+    import sys
+
+    _reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if _reconfigure is not None:
+        _reconfigure(encoding="utf-8", errors="replace")
+
     server = make_web_server(8000)
     print("已启动:http://127.0.0.1:8000  (Ctrl+C 退出)")
     server.serve_forever()
