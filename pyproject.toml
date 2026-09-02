@@ -14,6 +14,10 @@ dev = ["pytest>=8", "mypy>=1.10", "ruff>=0.5"]
 testpaths = ["tests"]        # 只去 tests/ 里找测试,别扫整个项目
 pythonpath = ["."]           # ← 救命稻草:让 `import myshop` 能找到包
 addopts = "-v --strict-markers"   # -v = 每条测试单独打一行,初学者看得更清楚
+# 第 18 页第二节:给核心用例分级。--strict-markers 要求每个标记先在这里登记
+markers = [
+    "p0: 核心链路,挂了就是生产事故",
+]
 # 只有名字符合这些规则的东西才会被当成测试
 python_files = ["test_*.py"]
 python_functions = ["test_*"]

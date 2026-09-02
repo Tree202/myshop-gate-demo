@@ -28,6 +28,7 @@ def test_下单会把总价算对并且带上价格文案(tmp_path: Path) -> Non
     assert 订单["total_text"] == "¥25.00"
 
 
+@pytest.mark.p0  # 第 18 页:P0 = 挂了就是生产事故的那一条链路
 def test_订单真的落盘了_换个连接还读得到(tmp_path: Path) -> None:
     数据库 = str(tmp_path / "test.db")
 
