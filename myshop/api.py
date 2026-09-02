@@ -93,6 +93,22 @@ def make_server(port: int = 8000) -> HTTPServer:
 
 
 if __name__ == "__main__":
+    # Windows 上如果输出被重定向或被工具捕获(`> log.txt`、`| tee`、编辑器的运行面板),
+    # stdout 会退回系统代码页(英文机器 cp1252、简体中文机器 cp936),
+    # 下面那句中文就直接 UnicodeEncodeError,服务器根本起不来。
+    # 实测:把 PYTHONIOENCODING 清掉之后,python -c "print('中文')" 的退出码就是 1。
+    # 直接在终端敲不会犯,因为 Python 对 Windows 控制台走的是另一条路 —— 所以这个坑
+    # 只在「别人用工具跑你的项目」时才现形,自己手敲一辈子也遇不到。
+    import sys
+
+    # 用 getattr 而不是直接调:reconfigure 只在 TextIOWrapper 上有,
+    # stdout 被换成别的对象时(重定向、测试替身)它可以不存在 —— 写成
+    # sys.stdout.reconfigure(...) 类型检查会直接判红,这不是迁就工具,
+    # 是那个属性本来就是可选的。
+    _reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if _reconfigure is not None:
+        _reconfigure(encoding="utf-8", errors="replace")
+
     server = make_server(8000)
     print("已启动:http://127.0.0.1:8000  (Ctrl+C 退出)")
     server.serve_forever()
