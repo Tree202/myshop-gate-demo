@@ -1,27 +1,39 @@
 # myshop —— 测试金字塔演示项目
 
-一个迷你网上商店,用来演示测试金字塔的四层。配套教程见上一级目录的
-`claude-code-sop.html` 等四份 HTML。
+一个迷你网上商店,用来演示测试金字塔的四层。配套教程见上级目录的
+`index.html`(总入口)与 `ai-workflow/` 下的 23 页 HTML。
+
+> 分支说明:最新内容(含网页层与 E2E)在 `docs/windows-readme` 分支;
+> `main` 受质量门禁保护,须走 PR 过「三道检查」后合并 —— 门禁本身就是教程第 19 页的教具。
 
 ## 快速开始
 
 ```bash
-cd ~/Desktop/claude_data/learn_claude/myshop
+# macOS / Linux(在本项目根目录执行)
 .venv/bin/python -m pytest
 ```
 
-应该看到 `17 passed, 1 skipped`(skipped 的是 E2E,需要装 playwright)。
+```powershell
+# Windows PowerShell(在本项目根目录执行;虚拟环境不存在时先 python -m venv .venv)
+.\.venv\Scripts\python.exe -m pytest
+```
+
+应该看到:
+
+- 没装 playwright:`17 passed, 1 skipped`(skip 的是 E2E,`importorskip` 生效)
+- 装了 playwright + chromium:`19 passed`(两条 E2E 真跑,见文末)
 
 ## 三条常用命令
 
 ```bash
 .venv/bin/python -m ruff check .     # 规范检查   0.02 秒
 .venv/bin/python -m mypy             # 类型检查   0.27 秒
-.venv/bin/python -m pytest           # 全量测试   3.66 秒
+.venv/bin/python -m pytest           # 全量测试   3.66 秒(macOS 实测;Windows 约 4 秒)
 ```
 
-> ⚠️ 一律用 `.venv/bin/python -m xxx` 的形式。
+> ⚠️ 一律用 `.venv/bin/python -m xxx` 的形式(Windows 对应 `.venv\Scripts\python.exe -m xxx`)。
 > Claude Code 在 Bash 里跑命令不继承你终端的 `activate` 状态,写全路径才可靠。
+> Windows 终端中文乱码时先执行 `$env:PYTHONUTF8="1"`。
 
 ## 目录结构
 
@@ -34,13 +46,15 @@ myshop/
 │   ├── __init__.py
 │   ├── price.py                 纯函数,不碰任何外部东西
 │   ├── order.py                 跨模块调用 + 写 sqlite
-│   └── api.py                   HTTP 接口(只用标准库)
+│   ├── api.py                   HTTP 接口(只用标准库)
+│   └── web.py                   最小下单网页(给第 4 层 E2E 点的)
 └── tests/
     ├── test_price.py            ① 单元测试   5 条   0.00 秒
     ├── test_order.py            ② 集成测试   5 条   0.02 秒
     ├── test_api.py              ③ 接口测试   7 条   3.64 秒
     └── e2e/
-        └── test_checkout_e2e.py ④ E2E(示意,默认 skip)
+        ├── conftest.py          自动起停服务器 + 数据库隔离
+        └── test_checkout_e2e.py ④ E2E   2 条(没装浏览器驱动时 skip)
 ```
 
 ## 分层跑(流程步骤 3 用局部,步骤 5a 用全量)
@@ -97,4 +111,5 @@ curl -X POST http://127.0.0.1:8000/orders \
 .venv/bin/playwright install chromium
 ```
 
-注意本项目只有 JSON 接口、没有网页,所以 E2E 是示意代码,真跑需要先做个页面。
+装完再跑 `pytest`,那条 skip 就变成两条真跑的 E2E:`web.py` 提供最小下单页面,
+`tests/e2e/conftest.py` 会自动起停服务器并把订单写进临时数据库(不污染项目目录)。
