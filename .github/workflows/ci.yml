@@ -15,10 +15,27 @@ on:
     branches: [main]
   pull_request:            # 开 PR 时也跑 —— 这是门禁真正起作用的地方
 
+# 下面三段是「加了没代价」的三件套。教程第 18 页第九节列了这份配置
+# 刻意没包含什么、以及为什么;这三段不在那张表里,因为它们不需要权衡:
+#
+#   permissions  —— 默认给的令牌权限偏大。这个流水线只需要读代码,
+#                   就明确写成只读。万一某个 action 被投毒,它能干的事就少得多。
+#   concurrency  —— 同一个 PR 连推三次,默认会排三条流水线,前两条白跑。
+#                   设了它,新的一推,旧的自动取消。
+#   timeout      —— 卡住的任务默认能跑到 6 小时。测试三秒跑完的项目,
+#                   十分钟还没结束一定是出事了,早点掐掉。
+permissions:
+  contents: read           # 只读代码,不给写权限
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # 同一分支的新提交,把上一条还在跑的取消掉
+
 jobs:
   gate:
     name: 三道检查
     runs-on: ubuntu-latest       # GitHub 提供的一台干净的 Linux 机器
+    timeout-minutes: 10          # 正常 20 秒跑完,十分钟还没完就是卡住了
 
     steps:
       # ---- 准备:把代码拉下来 ----
