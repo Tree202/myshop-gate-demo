@@ -1,4 +1,4 @@
-"""第 4 层:E2E 测试(金字塔最顶上,数量最少、最慢、最容易「假失败」)。
+r"""第 4 层:E2E 测试(金字塔最顶上,数量最少、最慢、最容易「假失败」)。
 
 这一层测什么:
     像真人一样开浏览器 -> 点按钮 -> 填表单 -> 看页面上有没有出现「下单成功」。
@@ -7,9 +7,14 @@
     不测价格进位、不测 404 文案、不测每种错误分支 ——
     那些用第 1~3 层测,又快又稳。E2E 写多了会慢到没人愿意跑。
 
-跑这一层需要两样东西(都已经装好):
-    .venv/bin/python -m pip install pytest-playwright
-    .venv/bin/playwright install chromium
+跑这一层需要两样东西，**默认都没装**（所以这两条测试平时是 skip 的）:
+    macOS / Linux:
+        .venv/bin/python -m pip install pytest-playwright
+        .venv/bin/playwright install chromium
+    Windows PowerShell（目录名不一样，是 Scripts 不是 bin）:
+        .\.venv\Scripts\python.exe -m pip install pytest-playwright
+        .\.venv\Scripts\playwright.exe install chromium
+    装完基线从 17 passed, 1 skipped 变成 19 passed。
 页面由 myshop/web.py 提供,服务器在 conftest.py 里自动起停 ——
 不用你手动开一个终端跑服务。
 """
