@@ -3,8 +3,8 @@
 一个迷你网上商店,用来演示测试金字塔的四层。配套教程见上级目录的
 `index.html`(总入口)与 `ai-workflow/` 下的 23 页 HTML。
 
-> 分支说明:最新内容(含网页层与 E2E)在 `docs/windows-readme` 分支;
-> `main` 受质量门禁保护,须走 PR 过「三道检查」后合并 —— 门禁本身就是教程第 19 页的教具。
+> 最新内容就在 `main`。`main` 受质量门禁保护,须走 PR 过「三道检查」后合并 ——
+> 门禁本身就是教程第 19 页的教具，那几条分支与合并记录是教学资产，别删。
 
 ## 快速开始
 
@@ -14,8 +14,22 @@
 ```
 
 ```powershell
-# Windows PowerShell(在本项目根目录执行;虚拟环境不存在时先 python -m venv .venv)
+# Windows PowerShell(在本项目根目录执行)
 .\.venv\Scripts\python.exe -m pytest
+```
+
+**刚 克隆下来、还没有 `.venv`?** 先建环境并装工具 —— 虚拟环境不进 git（见 `.gitignore`），所以下载下来它不存在，而 `python -m venv` **只建空环境、不装任何包**：
+
+```bash
+# macOS / Linux
+python3 -m venv .venv
+.venv/bin/python -m pip install pytest mypy ruff
+```
+
+```powershell
+# Windows PowerShell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install pytest mypy ruff
 ```
 
 应该看到:
