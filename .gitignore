@@ -1,6 +1,6 @@
 # ---- Python 垃圾 ----
 __pycache__/
-*.py[cod]
+*.py[codz]
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -8,15 +8,21 @@ __pycache__/
 # ---- 虚拟环境(几千个文件、几十 MB)----
 .venv/
 venv/
+env/
+ENV/
 
 # ---- 密钥,千万别提交 ----
 .env
+.env.*
+!.env.example
+.envrc
 
-# ---- 数据库文件 ----
-*.db
+# ---- 本地数据库 ----
+*.sqlite3
+# 下面这条是本项目跑测试会生成的文件。
+# 注意:.gitignore 只认「整行以 # 开头」的注释 —— 写成 `myshop.db  # 说明`
+# 会被当成一个带空格和井号的文件名,那样它根本不会被忽略。
+myshop.db
 
-# ---- macOS ----
-.DS_Store
-
-# ---- PyCharm ----
+# ---- 编辑器 ----
 .idea/

@@ -4,10 +4,10 @@ version = "0.1.0"
 description = "用来演示测试金字塔四层的迷你商店"
 requires-python = ">=3.9"
 dependencies = []            # 主代码只用标准库,不装任何第三方包
-
-[project.optional-dependencies]
-# .venv/bin/python -m pip install -e ".[dev]" 一次装齐开发工具
-dev = ["pytest>=8", "mypy>=1.10", "ruff>=0.5"]
+# 没有 [project.optional-dependencies]:教程第 2 页、本项目 README
+# 与 CI 三处装工具用的都是 `pip install pytest mypy ruff`,
+# 没有一处用 `-e ".[dev]"` —— 留着它只会让读者去跑
+# 一条全书没教过的命令。2026-09-03 删。
 
 # ---------------- pytest:跑测试 ----------------
 [tool.pytest.ini_options]
@@ -27,7 +27,9 @@ python_functions = ["test_*"]
 python_version = "3.9"
 files = ["myshop", "tests"]
 strict = true                # 一步到位开严格模式
-check_untyped_defs = true    # 连没写类型标注的函数体也检查(防 AI 漏写 -> None)
+# 没有 check_untyped_defs:`--strict` 启用的清单里就有它,写两遍是冗余;
+# 而且“防 AI 漏写 -> None”靠的是 disallow_untyped_defs,不是它 ——
+# 这两件事教程第 2 页第五节与第 4 页都写明了。2026-09-03 删。
 
 [[tool.mypy.overrides]]
 module = "playwright.*"      # playwright 没装,别因为找不到它就报错
